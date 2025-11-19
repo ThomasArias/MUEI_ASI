@@ -1,6 +1,6 @@
-# MUEI_ASI
-
+========================================================================
  GUÍA DE INSTALACIÓN Y PUESTA EN MARCHA - PROYECTO FULLSTACK
+========================================================================
 
 Este documento detalla los pasos para configurar el entorno de desarrollo 
 en macOS, Windows y Ubuntu.
@@ -10,9 +10,9 @@ REQUISITOS PREVIOS:
 - Node.js (Versión LTS)
 - VSCode (Recomendado)
 
-
+========================================================================
 1. INSTALACIÓN DE HERRAMIENTAS (SEGÚN TU SISTEMA OPERATIVO)
-
+========================================================================
 
 ------------------------------------------------------------------------
 A. Opción para MACOS (Apple Silicon/Intel)
@@ -58,8 +58,9 @@ C. Opción para UBUNTU / LINUX
    java -version
    node -v
 
-
+========================================================================
 2. CONFIGURACIÓN DEL IDE (solo para VSCODE)
+========================================================================
 Para trabajar cómodamente, instalad estas extensiones (Click en Extensions):
 
 1. "Extension Pack for Java" (Microsoft) -> Imprescindible para el backend.
@@ -67,9 +68,9 @@ Para trabajar cómodamente, instalad estas extensiones (Click en Extensions):
 3. "ES7+ React/Redux/React-Native snippets" -> Atajos para React.
 4. "Lombok Annotations Support" -> Para que VSCode entienda Lombok.
 
-
+========================================================================
 3. PRIMERA EJECUCIÓN DEL PROYECTO
-
+========================================================================
 
 Una vez clonado el repositorio, seguid estos pasos una única vez para
 descargar las librerías:
@@ -90,9 +91,9 @@ PASO 2: PREPARAR FRONTEND
 2. Instala dependencias (NPM):
    npm install
 
-
+========================================================================
 4. CÓMO ARRANCAR EL PROYECTO (DÍA A DÍA)
-
+========================================================================
 Necesitarás dos terminales abiertas simultáneamente:
 
 TERMINAL 1 (Backend):
