@@ -1,108 +1,111 @@
-========================================================================
- GUÍA DE INSTALACIÓN Y PUESTA EN MARCHA - PROYECTO FULLSTACK
-========================================================================
 
-Este documento detalla los pasos para configurar el entorno de desarrollo 
-en macOS, Windows y Ubuntu.
+### 🍎 macOS (Apple Silicon / Intel)
+Recomendamos usar Homebrew. Abre la terminal y ejecuta:
 
-REQUISITOS PREVIOS:
-- Java Development Kit (JDK) Versión 21
-- Node.js (Versión LTS)
-- VSCode (Recomendado)
+```bash
+# 1. Instalar Java 21 y Node.js
+brew install openjdk@21 node
 
-========================================================================
-1. INSTALACIÓN DE HERRAMIENTAS (SEGÚN TU SISTEMA OPERATIVO)
-========================================================================
+# 2. Verificar instalaciones
+java -version
+node -v
+````
 
-------------------------------------------------------------------------
-A. Opción para MACOS (Apple Silicon/Intel)
-------------------------------------------------------------------------
-Requisito: Tener instalado Homebrew (https://brew.sh/)
-1. Abre tu terminal.
-2. Instala Java 21:
-   brew install openjdk@21
-   (Sigue las instrucciones que aparecen en pantalla para agregar java al PATH)
-3. Instala Node.js:
-   brew install node
-4. Verifica:
-   java -version
-   node -v
+### 🪟 Windows
 
-------------------------------------------------------------------------
-B. Opción para WINDOWS
-------------------------------------------------------------------------
-Opción recomendada (usando Winget en PowerShell) o descargar manualmente:
+Descarga e instala manualmente:
 
-JAVA 21:
-- Descarga: https://adoptium.net/ (Elige Temurin 21 - LTS)
-- Durante la instalación, asegúrate de marcar la opción "Set JAVA_HOME variable".
+1.  **Java JDK 21 (LTS):**
+      * Descarga: [Eclipse Temurin JDK 21](https://adoptium.net/)
+      * *IMPORTANTE:* Durante la instalación, marca la casilla **"Set JAVA\_HOME variable"**.
+2.  **Node.js (LTS):**
+      * Descarga: [Node.js Official Website](https://nodejs.org/)
+3.  **Verificar:** Abre PowerShell y ejecuta:
+    ```powershell
+    java -version
+    node -v
+    ```
 
-NODE.JS:
-- Descarga: https://nodejs.org/ (Elige la versión "LTS Recommended for most users")
+### 🐧 Linux
 
-Verifica abriendo una nueva terminal (PowerShell o CMD):
-   java -version
-   node -v
+Abre tu terminal y ejecuta:
 
-------------------------------------------------------------------------
-C. Opción para UBUNTU / LINUX
-------------------------------------------------------------------------
-1. Abre tu terminal.
-2. Instala Java 21:
-   sudo apt update
-   sudo apt install openjdk-21-jdk
-3. Instala Node.js (versión actual):
-   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-   sudo apt-get install -y nodejs
-4. Verifica:
-   java -version
-   node -v
+```bash
+# 1. Instalar Java 21
+sudo apt update
+sudo apt install openjdk-21-jdk
 
-========================================================================
-2. CONFIGURACIÓN DEL IDE (solo para VSCODE)
-========================================================================
-Para trabajar cómodamente, instalad estas extensiones (Click en Extensions):
+# 2. Instalar Node.js
+curl -fsSL [https://deb.nodesource.com/setup_20.x](https://deb.nodesource.com/setup_20.x) | sudo -E bash -
+sudo apt-get install -y nodejs
+```
 
-1. "Extension Pack for Java" (Microsoft) -> Imprescindible para el backend.
-2. "Spring Boot Extension Pack" (VMware) -> Ayuda con Spring.
-3. "ES7+ React/Redux/React-Native snippets" -> Atajos para React.
-4. "Lombok Annotations Support" -> Para que VSCode entienda Lombok.
+-----
 
-========================================================================
-3. PRIMERA EJECUCIÓN DEL PROYECTO
-========================================================================
+## ⚙️ 2. Configuración del IDE (para VSCode)
 
-Una vez clonado el repositorio, seguid estos pasos una única vez para
-descargar las librerías:
+Para trabajar correctamente, instala estas extensiones desde el marketplace de VSCode:
 
-PASO 1: PREPARAR BACKEND
-------------------------
-1. Abre una terminal en la raíz del proyecto.
-2. Entra a la carpeta backend:
-   cd backend
-3. Instala dependencias (Maven):
-   (Mac/Linux): ./mvnw clean install
-   (Windows):   .\mvnw clean install
+  * **Extension Pack for Java** (Microsoft)
+  * **Spring Boot Extension Pack** (VMware)
+  * **ES7+ React/Redux/React-Native snippets**
+  * **Lombok Annotations Support**
 
-PASO 2: PREPARAR FRONTEND
--------------------------
-1. Vuelve a la raíz y entra a frontend:
-   cd ../frontend
-2. Instala dependencias (NPM):
-   npm install
+-----
 
-========================================================================
-4. CÓMO ARRANCAR EL PROYECTO (DÍA A DÍA)
-========================================================================
-Necesitarás dos terminales abiertas simultáneamente:
+## 📦 3. Instalación de Dependencias
 
-TERMINAL 1 (Backend):
-   cd backend
-   (Mac/Linux): ./mvnw spring-boot:run
-   (Windows):   .\mvnw spring-boot:run
-   -> El servidor iniciará en http://localhost:8080
+Ejecuta estos comandos **una única vez** después de clonar el proyecto.
 
-TERMINAL 2 (Frontend):
-   cd frontend
-   npm run dev
-   -> La web iniciará en http://localhost:5173
+### Backend (Spring Boot)
+
+Desde la carpeta raíz `Project/`:
+
+```bash
+cd backend
+
+# macOS / Linux:
+chmod +x mvnw
+./mvnw clean install
+
+# Windows:
+.\mvnw clean install
+```
+
+### Frontend (React)
+
+Desde la carpeta raíz `Project/`:
+
+```bash
+cd frontend
+npm install
+```
+
+-----
+
+## ▶️ 4. Ejecución del Proyecto
+
+Necesitarás dos terminales abiertas simultáneamente.
+
+### Terminal 1: Backend 🐘
+
+*(Servidor en http://localhost:8080)*
+
+```bash
+cd backend
+
+# macOS / Linux:
+./mvnw spring-boot:run
+
+# Windows:
+.\mvnw spring-boot:run
+```
+
+### Terminal 2: Frontend ⚛️
+
+*(Cliente Web en http://localhost:5173)*
+
+```bash
+cd frontend
+npm run dev
+```
