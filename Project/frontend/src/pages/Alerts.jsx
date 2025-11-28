@@ -17,7 +17,9 @@ export default function Alerts() {
     }
 
     try {
-      const data = await res.json();
+        const res = await fetch('http://localhost:8080/api/alerts');
+        const data = await res.json();
+        console.log('Fetched alerts from backend:', data);
       setAlerts(data);
     } catch (err) {
       console.error('Error cargando alertas:', err);
@@ -27,7 +29,7 @@ export default function Alerts() {
   const fetchProducts = () => {
     fetch('http://localhost:8080/api/products')
       .then(res => res.json())
-      .then(data => setProducts(data))
+      .then(data => { console.log('Fetched products from backend:', data); setProducts(data); })
       .catch(err => console.error("Error cargando productos:", err));
   };
 

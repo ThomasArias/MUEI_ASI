@@ -1,9 +1,13 @@
 package com.asi.backend.controller;
 
+import com.asi.backend.model.Alert;
 import com.asi.backend.model.Movement;
 import com.asi.backend.model.Product;
+import com.asi.backend.repository.AlertRepository;
 import com.asi.backend.repository.MovementRepository;
 import com.asi.backend.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -20,11 +24,16 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:5173")
 public class MovementController {
 
+    private static final Logger logger = LoggerFactory.getLogger(MovementController.class);
+
     @Autowired
     private MovementRepository movementRepository;
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private AlertRepository alertRepository;
 
     @GetMapping
     public List<Movement> getAllMovements() {
@@ -54,6 +63,21 @@ public class MovementController {
         }
 
         productRepository.save(product);
+
+        // Recalcular y guardar estados de alertas relacionadas con este producto
+        try {
+            List<Alert> alerts = alertRepository.findByProductId(product.getId());
+            for (Alert alert : alerts) {
+                if (product.getStockQuantity() < alert.getThreshold()) {
+                    alert.setStatus("Stock Bajo");
+                } else {
+                    alert.setStatus("Correcto");
+                }
+            }
+            alertRepository.saveAll(alerts);
+        } catch (Exception ex) {
+            logger.error("Error actualizando alertas para producto {}: {}", product.getId(), ex.getMessage(), ex);
+        }
 
         Movement movement = new Movement();
         movement.setProduct(product);
