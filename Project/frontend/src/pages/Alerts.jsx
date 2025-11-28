@@ -17,7 +17,6 @@ export default function Alerts() {
     }
 
     try {
-      const res = await fetch('http://localhost:8080/api/alerts');
       const data = await res.json();
       setAlerts(data);
     } catch (err) {
