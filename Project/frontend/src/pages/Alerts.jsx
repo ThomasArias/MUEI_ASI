@@ -8,11 +8,21 @@ export default function Alerts() {
   const [loading, setLoading] = useState(true);
 
   // Fetch alerts and products
-  const fetchAlerts = () => {
-    fetch('http://localhost:8080/api/alerts')
-      .then(res => res.json())
-      .then(data => setAlerts(data))
-      .catch(err => console.error("Error cargando alertas:", err));
+  const fetchAlerts = async () => {
+    try {
+      // Antes de obtener las alertas, solicitar al backend que recalcule los estados
+      await fetch('http://localhost:8080/api/alerts/update-status', { method: 'PUT' });
+    } catch (err) {
+      console.error('Error actualizando estados de alertas:', err);
+    }
+
+    try {
+      const res = await fetch('http://localhost:8080/api/alerts');
+      const data = await res.json();
+      setAlerts(data);
+    } catch (err) {
+      console.error('Error cargando alertas:', err);
+    }
   };
 
   const fetchProducts = () => {
@@ -23,9 +33,9 @@ export default function Alerts() {
   };
 
   useEffect(() => {
-    fetchAlerts();
+    // Inicial: obtener productos y actualizar/obtener alertas una sola vez al montar
     fetchProducts();
-    setLoading(false);
+    fetchAlerts().finally(() => setLoading(false));
   }, []);
 
   // Handle form submission
