@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search, Filter, Edit, Trash2, Plus, Save, X } from 'lucide-react';
+import MovementDetailsModal from '../components/MovementDetailsModal';
 import { useUser } from '../context/UserContext';
 
 export default function Inventory() {
@@ -26,6 +27,7 @@ export default function Inventory() {
 
   const [movements, setMovements] = useState([]);
   const [movementForm, setMovementForm] = useState({ productId: '', quantity: '', type: 'IN', reason: '' });
+  const [selectedMovement, setSelectedMovement] = useState(null);
 
   const fetchProducts = () => {
     fetch('http://localhost:8080/api/products')
@@ -158,19 +160,7 @@ export default function Inventory() {
     <div className="p-6 bg-[#FDFBF7] min-h-full">
       <h1 className="text-3xl font-bold text-gray-800 mb-4">Inventario</h1>
 
-      <div className="mb-6">
-        <div className="w-full lg:w-64">
-          <label className="block text-sm font-medium text-gray-600 mb-2">Sección de Inventario</label>
-          <select
-            value={activeTab}
-            onChange={e => setActiveTab(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm"
-          >
-            <option value="products">Productos</option>
-            <option value="movements">Movimientos</option>
-          </select>
-        </div>
-      </div>
+      {/* Se eliminó el desplegable interno de selección de sección; la navegación se controla desde la barra lateral */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
@@ -441,7 +431,15 @@ export default function Inventory() {
                     ) : movements.slice(0, 50).map(m => (
                       <tr key={m.id} className="group hover:bg-[#FDFBF7] transition-colors">
                         <td className="py-3 pl-2 text-sm text-gray-600">{new Date(m.date).toLocaleDateString()}</td>
-                        <td className="py-3 text-sm text-gray-800">{m.product?.name}</td>
+                        <td className="py-3 text-sm text-gray-800">
+                          <button
+                            onClick={() => setSelectedMovement(m)}
+                            className="text-left w-full hover:underline text-sm text-blue-600 font-semibold cursor-pointer"
+                            title="Ver detalles del movimiento"
+                          >
+                            {m.product?.name}
+                          </button>
+                        </td>
                         <td className="py-3 text-sm text-gray-700">{m.quantity}</td>
                         <td className="py-3 text-sm">
                           <span className={`px-2 py-1 rounded-full text-xs ${m.type === 'IN' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -457,6 +455,9 @@ export default function Inventory() {
           </div>
         </div>
       </div>
+      {selectedMovement && (
+        <MovementDetailsModal movement={selectedMovement} onClose={() => setSelectedMovement(null)} />
+      )}
     </div>
   );
 }
