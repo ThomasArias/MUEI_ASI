@@ -30,6 +30,14 @@ export default function Inventory() {
       });
   };
 
+  const updateAlertStatuses = async () => {
+  try {
+    await fetch('http://localhost:8080/api/alerts/update-status', { method: 'PUT' });
+  } catch (error) {
+    console.error("Error actualizando estados de alertas:", error);
+  }
+};
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -50,6 +58,7 @@ export default function Inventory() {
 
       if (response.ok) {
         fetchProducts();
+        await updateAlertStatuses();
         handleClear(); 
       }
     } catch (error) {

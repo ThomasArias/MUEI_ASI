@@ -4,6 +4,8 @@ import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
 import ProductList from './components/ProductList';
 import Inventory from './pages/Inventory';
+import Alerts from './pages/Alerts';
+
 
 function App() {
   return (
@@ -18,7 +20,7 @@ function App() {
               <Route path="/orders" element={<div className="p-10">Página de Pedidos (En construcción)</div>} />
               <Route path="/suppliers" element={<div className="p-10">Página de Proveedores (En construcción)</div>} />
               <Route path="/reports" element={<div className="p-10">Página de Informes (En construcción)</div>} />
-              <Route path="/alerts" element={<div className="p-10">Página de Alertas (En construcción)</div>} />
+              <Route path="/alerts" element={<Alerts />} />
               <Route path="/settings" element={<div className="p-10">Configuración (En construcción)</div>} />
             </Routes>
           </main>
