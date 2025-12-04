@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Box, ShoppingCart, Truck, BarChart3, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Box, ShoppingCart, Truck, BarChart3, Settings, LogOut, Bell } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import RoleSwitcher from './RoleSwitcher';
 
 export default function Sidebar() {
@@ -28,6 +29,43 @@ export default function Sidebar() {
     return `${base} text-gray-600 hover:bg-gray-50 hover:text-gray-900 ml-10`;
   };
 
+  const [activeAlertsCount, setActiveAlertsCount] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchActiveAlerts = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/api/alerts');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        const count = Array.isArray(data) ? data.filter(a => a.status === 'Stock Bajo').length : 0;
+        setActiveAlertsCount(count);
+      } catch (e) {
+        console.error('Error fetching alerts for sidebar badge:', e);
+      }
+    };
+
+    // Inicial: obtener contador
+    fetchActiveAlerts();
+    // Escuchar evento global para refresco inmediato.
+    // Si el evento incluye `detail.activeCount`, lo usamos directamente (evita fetch extra).
+    const handler = (e) => {
+      try {
+        if (e && e.detail && typeof e.detail.activeCount === 'number') {
+          if (mounted) setActiveAlertsCount(e.detail.activeCount);
+        } else {
+          fetchActiveAlerts();
+        }
+      } catch (err) {
+        // fallback: recuperar desde API
+        fetchActiveAlerts();
+      }
+    };
+
+    window.addEventListener('alertsUpdated', handler);
+    return () => { mounted = false; window.removeEventListener('alertsUpdated', handler); };
+  }, []);
   return (
     <div className="w-64 bg-white h-screen border-r border-gray-200 flex flex-col p-6 fixed left-0 top-0">
       <RoleSwitcher />
@@ -53,6 +91,17 @@ export default function Sidebar() {
         <Link to="/orders" className={getLinkClass('/orders')}>
           <ShoppingCart size={20} />
           Pedidos
+        </Link>
+        <Link to="/alerts" className={getLinkClass('/alerts')}>
+          <Bell size={20} />
+          <span className="flex items-center gap-3">
+            Alertas
+            {activeAlertsCount > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                {activeAlertsCount}
+              </span>
+            )}
+          </span>
         </Link>
         <Link to="/suppliers" className={getLinkClass('/suppliers')}>
           <Truck size={20} />

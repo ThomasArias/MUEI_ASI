@@ -65,16 +65,20 @@ public class MovementController {
         productRepository.save(product);
 
         // Recalcular y guardar estados de alertas relacionadas con este producto
+        List<Alert> activatedAlerts = null;
         try {
             List<Alert> alerts = alertRepository.findByProductId(product.getId());
+            java.util.ArrayList<Alert> newlyActivated = new java.util.ArrayList<>();
             for (Alert alert : alerts) {
-                if (product.getStockQuantity() < alert.getThreshold()) {
-                    alert.setStatus("Stock Bajo");
-                } else {
-                    alert.setStatus("Correcto");
+                String prevStatus = alert.getStatus();
+                String newStatus = (product.getStockQuantity() < alert.getThreshold()) ? "Stock Bajo" : "Correcto";
+                alert.setStatus(newStatus);
+                if (!"Stock Bajo".equals(prevStatus) && "Stock Bajo".equals(newStatus)) {
+                    newlyActivated.add(alert);
                 }
             }
             alertRepository.saveAll(alerts);
+            activatedAlerts = newlyActivated;
         } catch (Exception ex) {
             logger.error("Error actualizando alertas para producto {}: {}", product.getId(), ex.getMessage(), ex);
         }
@@ -89,7 +93,11 @@ public class MovementController {
 
         movementRepository.save(movement);
 
-        return ResponseEntity.ok(movement);
+        // Devolver movimiento y las alertas que pasaron a 'Stock Bajo' (si las hay)
+        java.util.Map<String, Object> resp = new java.util.HashMap<>();
+        resp.put("movement", movement);
+        resp.put("activatedAlerts", activatedAlerts != null ? activatedAlerts : java.util.Collections.emptyList());
+        return ResponseEntity.ok(resp);
     }
 
     public static class MovementRequest {

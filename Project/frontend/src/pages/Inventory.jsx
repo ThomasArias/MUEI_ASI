@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search, Filter, Edit, Trash2, Plus, Save, X } from 'lucide-react';
 import MovementDetailsModal from '../components/MovementDetailsModal';
@@ -28,6 +28,14 @@ export default function Inventory() {
   const [movements, setMovements] = useState([]);
   const [movementForm, setMovementForm] = useState({ productId: '', quantity: '', type: 'IN', reason: '' });
   const [selectedMovement, setSelectedMovement] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const prevProductsRef = useRef([]);
+
+  const pushNotification = (text) => {
+    const id = Date.now() + Math.random();
+    setNotifications((s) => [...s, { id, text }]);
+    setTimeout(() => setNotifications((s) => s.filter(n => n.id !== id)), 5000);
+  };
 
   const fetchProducts = () => {
     fetch('http://localhost:8080/api/products')
@@ -95,6 +103,8 @@ export default function Inventory() {
         fetchProducts();
         await updateAlertStatuses();
         handleClear(); 
+        // Notify other components (Sidebar) to refresh alerts count
+        try { window.dispatchEvent(new Event('alertsUpdated')); } catch(e){/* ignore */}
       }
     } catch (error) {
       console.error("Error guardando:", error);
@@ -123,12 +133,23 @@ export default function Inventory() {
         body: JSON.stringify(payload)
       });
 
+      const data = await res.json();
       if (res.ok) {
         setMovementForm({ productId: '', quantity: '', type: 'IN', reason: '' });
         fetchProducts();
         fetchMovements();
+        // Mostrar notificaciones si el backend devolvió alertas activadas
+        if (data && data.activatedAlerts && data.activatedAlerts.length > 0) {
+          data.activatedAlerts.forEach(a => {
+            const prod = products.find(p => p.id === a.productId);
+            const name = prod ? prod.name : `Producto ${a.productId}`;
+            pushNotification(`Alerta activada: ${name} - Stock Bajo`);
+          });
+        }
+        // Notificar a Sidebar para refrescar el badge inmediatamente
+        try { window.dispatchEvent(new Event('alertsUpdated')); } catch(e) { /* ignore */ }
       } else {
-        const text = await res.text();
+        const text = data && data.message ? data.message : await res.text();
         alert('Error: ' + text);
       }
     } catch (error) {
@@ -167,6 +188,14 @@ export default function Inventory() {
 
   return (
     <div className="p-6 bg-[#FDFBF7] min-h-full">
+      {/* Notifications */}
+      <div className="fixed top-6 right-6 z-50 flex flex-col gap-3">
+        {notifications.map(n => (
+          <div key={n.id} className="bg-white shadow-md border-l-4 border-green-600 text-gray-800 px-4 py-3 rounded-md">
+            {n.text}
+          </div>
+        ))}
+      </div>
       <h1 className="text-3xl font-bold text-gray-800 mb-4">Inventario</h1>
 
       {/* Se eliminó el desplegable interno de selección de sección; la navegación se controla desde la barra lateral */}
