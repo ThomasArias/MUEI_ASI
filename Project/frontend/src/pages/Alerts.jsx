@@ -19,8 +19,16 @@ export default function Alerts() {
     try {
         const res = await fetch('http://localhost:8080/api/alerts');
         const data = await res.json();
-        console.log('Fetched alerts from backend:', data);
-      setAlerts(data);
+          console.log('Fetched alerts from backend:', data);
+          setAlerts(data);
+
+          // Emit event so other components (Sidebar, Inventory) can update immediately
+          try {
+            const activeCount = Array.isArray(data) ? data.filter(a => a.status === 'Stock Bajo').length : 0;
+            window.dispatchEvent(new CustomEvent('alertsUpdated', { detail: { activeCount, alerts: data } }));
+          } catch (e) {
+            console.error('Error dispatching alertsUpdated event:', e);
+          }
     } catch (err) {
       console.error('Error cargando alertas:', err);
     }
@@ -61,7 +69,25 @@ export default function Alerts() {
   const handleDelete = async (id) => {
     if (!confirm("¿Estás seguro de eliminar esta alerta?")) return;
     try {
-      await fetch(`http://localhost:8080/api/alerts/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8080/api/alerts/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(text || 'Error eliminando alerta');
+      }
+
+      // Actualizamos el estado local inmediatamente para reflejar el cambio en la UI
+      setAlerts(prev => {
+        const newAlerts = Array.isArray(prev) ? prev.filter(a => a.id !== id) : [];
+        try {
+          const activeCount = Array.isArray(newAlerts) ? newAlerts.filter(a => a.status === 'Stock Bajo').length : 0;
+          window.dispatchEvent(new CustomEvent('alertsUpdated', { detail: { activeCount, alerts: newAlerts } }));
+        } catch (e) {
+          console.error('Error dispatching alertsUpdated after delete:', e);
+        }
+        return newAlerts;
+      });
+
+      // Re-sincronizar en background por si hay desajustes en el servidor
       fetchAlerts();
     } catch (error) {
       console.error("Error eliminando alerta:", error);
