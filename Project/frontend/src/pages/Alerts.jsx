@@ -4,7 +4,7 @@ import { Plus, Trash2, Save } from 'lucide-react';
 export default function Alerts() {
   const [alerts, setAlerts] = useState([]);
   const [products, setProducts] = useState([]);
-  const [formData, setFormData] = useState({ productId: '', threshold: '' });
+  const [formData, setFormData] = useState({ product: { id: '' }, threshold: '' });
   const [loading, setLoading] = useState(true);
 
   // Fetch alerts and products
@@ -51,14 +51,18 @@ export default function Alerts() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        product: { id: Number(formData.product.id) },
+        threshold: Number(formData.threshold),
+      };
       const response = await fetch('http://localhost:8080/api/alerts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       if (response.ok) {
         fetchAlerts();
-        setFormData({ productId: '', threshold: '' });
+        setFormData({ product: { id: '' }, threshold: '' });
       }
     } catch (error) {
       console.error("Error creando alerta:", error);
@@ -110,8 +114,8 @@ export default function Alerts() {
                 <select
                   required
                   className="w-full bg-[#F3F0E7] border-none rounded-lg px-4 py-3 text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-green-600/20 focus:outline-none transition-all"
-                  value={formData.productId}
-                  onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                  value={formData.product.id}
+                  onChange={(e) => setFormData({ ...formData, product: { id: e.target.value } })}
                 >
                   <option value="">Selecciona un producto</option>
                   {products.map(product => (
@@ -164,10 +168,10 @@ export default function Alerts() {
                     <tr key={alert.id} className="group hover:bg-[#FDFBF7] transition-colors">
                       <td className="py-4 pl-2">
                         <div className="font-medium text-gray-800">
-                          {products.find(p => p.id === alert.productId)?.name || 'Producto no encontrado'}
+                          {alert.product?.name || 'Producto no encontrado'}
                         </div>
                       </td>
-                      <td className="py-4 text-sm text-gray-600">{products.find(p => p.id === alert.productId)?.stockQuantity || 'N/A'}</td> {/* Nueva columna */}
+                      <td className="py-4 text-sm text-gray-600">{alert.product?.stockQuantity ?? 'N/A'}</td> {/* Nueva columna */}
                       <td className="py-4 text-sm text-gray-600">{alert.threshold}</td>
                       <td className="py-4">
                         <span className={`font-semibold ${alert.status === 'Stock Bajo' ? 'text-red-500' : 'text-green-600'}`}>

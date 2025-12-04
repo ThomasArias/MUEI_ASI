@@ -30,10 +30,13 @@ public class AlertController {
 
     @PostMapping
     public ResponseEntity<?> createAlert(@RequestBody Alert alert) {
-        Product product = productRepository.findById(alert.getProductId()).orElse(null);
+        Product product = (alert.getProduct() != null && alert.getProduct().getId() != null)
+                ? productRepository.findById(alert.getProduct().getId()).orElse(null)
+                : null;
         if (product == null) {
             return ResponseEntity.badRequest().body("El producto asociado no existe.");
         }
+        alert.setProduct(product);
         if (product.getStockQuantity() < alert.getThreshold()) {
             alert.setStatus("Stock Bajo");
         } else {
@@ -46,7 +49,9 @@ public class AlertController {
     public ResponseEntity<?> updateAlertStatuses() {
         List<Alert> alerts = alertRepository.findAll();
         for (Alert alert : alerts) {
-            Product product = productRepository.findById(alert.getProductId()).orElse(null);
+            Product product = alert.getProduct() != null && alert.getProduct().getId() != null
+                    ? productRepository.findById(alert.getProduct().getId()).orElse(null)
+                    : null;
             if (product != null) {
                 if (product.getStockQuantity() < alert.getThreshold()) {
                     alert.setStatus("Stock Bajo");
