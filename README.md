@@ -1,5 +1,20 @@
+# Despliegue en docker
+
+El proyecto incluye un docker compose que orquesta el despliegue del frontend y backend. Hay que tener los puertos 5173 y 8080 libres. Para ejecutar solo hay que lanzar este comando desde la carpeta Project.
+
+
+```bash
+docker compose up -d
+````
+
+Se puede acceder al sistema desde [http://localhost:5173](http://localhost:5173/)
+
+
+
+# Instalación manual
 
 ### 🍎 macOS (Apple Silicon / Intel)
+
 Recomendamos usar Homebrew. Abre la terminal y ejecuta:
 
 ```bash
